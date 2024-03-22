@@ -1,0 +1,146 @@
+<div class="add__product">
+    <div class="wrap">
+        <div class="add__product-w">
+            <form id="add__product">
+                <h1 style="text-align: center;font-weight: bold;">Update Product</h1>
+                <label class="label__add" for="name">Name:
+                    <input value="{{product.name}}" required type="text" id="name" name="name">
+                </label>
+                <label class="label__add" for="quantity">Quantity:
+                    <input value="{{product.quantity}}" required type="number" id="quantity" name="quantity">
+                </label>
+                <label class="label__add" for="price">Price:
+                    <input value="{{product.price}}" required type="number" id="price" name="price">
+                </label>
+                <label class="label__add" for="status">Status:
+                    <input checked type="radio" id="available" name="status" value="available">
+                    <label for="available">Available</label><br>
+
+                    <input type="radio" id="soldout" name="status" value="soldout">
+                    <label for="soldout">Sold Out</label><br>
+                </label>
+                <label class="label__add" for="thumbnail">Thumbnail:
+                    <input type="file" id="thumbnail" name="thumbnail" accept="image/*">
+                </label>
+                <label class="label__add" for="">ㅤ
+                    <img id="previewImage" style="width: 56px;height: 56px;display: block;object-fit: cover;" src=""
+                        alt="">
+                </label>
+                <label class="label__add" for="description">Description:
+                    <input value="{{product.description}}" required type="text" id="description" name="description">
+                </label>
+                <label class="label__add" for="id_distributor">Distributor:
+                    <select name="id_distributor" id="id_distributor">
+                        {{#each distributors}}
+                        <option value="{{this._id}}">{{this.name}}</option>
+                        {{/each}}
+                    </select>
+                </label>
+                <label class="label__add" for="id_distributor">Category:
+                    <select name="id_category" id="id_category">
+                        {{#each categories}}
+                        <option value="{{this._id}}">{{this.name}}</option>
+                        {{/each}}
+                    </select>
+                </label>
+                <button class="btn__addProduct" type="submit">Update</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    const BASE_URL = "http://localHost:3000/";
+    const
+        imgPreview = document.querySelector('#previewImage'),
+        formAdd = document.querySelector('#add__product'),
+        inputName = document.querySelector('#name'),
+        inputQuantity = document.querySelector('#quantity'),
+        inputPrice = document.querySelector('#price'),
+        inputDescription = document.querySelector('#description'),
+        availableRadio = document.querySelector('#available'),
+        soldOutRadio = document.querySelector('#soldout'),
+        inputDistrubutor = document.querySelector('#id_distributor'),
+        inputCategory = document.querySelector('#id_category'),
+        selectedDistributor = document.querySelectorAll('option');
+
+    const currentUrl = window.location.pathname;
+    const match = currentUrl.match(/\/update-product\/([^\/]+)/);
+    const productId = match[1];
+
+    document.getElementById('thumbnail').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        const objectURL = URL.createObjectURL(file);
+
+        imgPreview.src = objectURL;
+        imgPreview.onload = function () {
+            URL.revokeObjectURL(objectURL);
+        }
+    });
+
+    fetch(`/get-product-by-id/${productId}`)
+        .then(res => res.json())
+        .then(data => {
+            selectedDistributor.forEach(e => {
+                if (e.value === data.data.id_distributor || e.value === data.data.id_category) {
+                    e.selected = true;
+                }
+            })
+            if (data.data.status == 0) {
+                availableRadio.checked = true;
+            } else {
+                soldOutRadio.checked = true;
+            }
+            imgPreview.src = convertLocalhostToIpAddress(data.data.thumbnail);
+        })
+    function convertLocalhostToIpAddress(url) {
+        const index = url.indexOf("3000/");
+        let newUrl = "";
+        if (index !== -1) {
+            newUrl = BASE_URL + url.substring(index + 5);
+        } else {
+            newUrl = url;
+        }
+        return newUrl;
+    }
+
+    add__product.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const name = inputName.value;
+        const quantity = inputQuantity.value;
+        const price = inputPrice.value;
+
+        let status = 0;
+        if (!availableRadio.checked) {
+            status = 1;
+        }
+        const thumbnail = document.getElementById('thumbnail').files[0];
+        const description = document.getElementById('description').value;
+        const id_distributor = inputDistrubutor.value;
+        const id_category = inputCategory.value;
+
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('quantity', quantity);
+        formData.append('price', price);
+        formData.append('status', status);
+        formData.append('thumbnail', thumbnail);
+        formData.append('description', description);
+        formData.append('id_distributor', id_distributor);
+        formData.append('id_category', id_category);
+
+        fetch(`/update-product/${productId}`, {
+            method: 'PUT',
+            body: formData
+        })
+            .then(res => res.json())
+            .then(data => {
+                alert("Product updated successfully!")
+                window.location.href = "/Products"
+            })
+            .catch(error => {
+                console.error('Error adding product:', error);
+            });
+
+    })
+</script>

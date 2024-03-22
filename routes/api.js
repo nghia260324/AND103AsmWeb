@@ -47,7 +47,7 @@ router.post('/add-distributor', async (req, res) => {
         res.json({
             "status": 400,
             "messenger": "Lỗi, Thêm thất bại!",
-            "data": [],
+            "data": {},
         });
     }
 })

@@ -1,13 +1,42 @@
-<div class="add__fruit">
+<div class="add__product">
     <div class="wrap">
-        <div class="add__fruit-w">
-            <form action="/update-distributor/{{distributor._id}}" method="post" id="add__fruit">
-                <h1 style="text-align: center;font-weight: bold;">Sửa thông tin Nhà Phân Phối</h1>
-                <label class="label__add" for="name">Tên:
+        <div class="add__product-w">
+            <form data-product-id="{{distributor._id}}" id="add__product">
+                <h1 style="text-align: center;font-weight: bold;">Update Distributor</h1>
+                <label class="label__add" for="name">Name:
                     <input value="{{distributor.name}}" required type="text" id="name" name="name">
                 </label>
-                <button class="btn__addFruit" type="submit">Sửa thông tin</button>
+                <button class="btn__addProduct" type="submit">Update</button>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+    const
+        add__product = document.querySelector('#add__product'),
+        inputName = document.querySelector('#name');
+
+    const productId = add__product.getAttribute('data-product-id')
+
+    add__product.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const name = inputName.value;
+
+        fetch(`/update-distributor/${productId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: name })
+        })
+            .then(res => res.json())
+            .then(data => {
+                alert('Distributor updated successfully!')
+                window.location.href = '/Distributors'
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    })
+</script>

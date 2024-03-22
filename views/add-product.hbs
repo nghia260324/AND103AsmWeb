@@ -1,0 +1,101 @@
+<div class="add__product">
+    <div class="wrap">
+        <div class="add__product-w">
+            <form id="add__product">
+                <h1 style="text-align: center;font-weight: bold;">Add Product</h1>
+                <label class="label__add" for="name">Name:
+                    <input required type="text" id="name" name="name">
+                </label>
+                <label class="label__add" for="quantity">Quantity:
+                    <input required type="number" id="quantity" name="quantity">
+                </label>
+                <label class="label__add" for="price">Price:
+                    <input required type="number" id="price" name="price">
+                </label>
+                <label class="label__add" for="status">Status:
+                    <input checked type="radio" id="available" name="status" value="available">
+                    <label for="available">Available</label><br>
+
+                    <input type="radio" id="soldout" name="status" value="soldout">
+                    <label for="soldout">Sold Out</label><br>
+                </label>
+                <label class="label__add" for="thumbnail">Thumbnail:
+                    <input required type="file" id="thumbnail" name="thumbnail" accept="image/*">
+                </label>
+                <label class="label__add" for="description">Description:
+                    <input required type="text" id="description" name="description">
+                </label>
+                <label class="label__add" for="id_distributor">Distributor:
+                    <select name="id_distributor" id="id_distributor">
+                        {{#each distributors}}
+                        <option value="{{this._id}}">{{this.name}}</option>
+                        {{/each}}
+                    </select>
+                </label>
+                <label class="label__add" for="id_distributor">Category:
+                    <select name="id_category" id="id_category">
+                        {{#each categories}}
+                        <option value="{{this._id}}">{{this.name}}</option>
+                        {{/each}}
+                    </select>
+                </label>
+                <button class="btn__addProduct" type="submit">Add</button>
+            </form>
+        </div>
+    </div>
+</div>
+{{!-- action="/add-product" method="post" id="add__product" --}}
+{{!-- enctype="multipart/form-data" --}}
+<script>
+    const formAdd = document.querySelector('#add__product');
+    const inputName = document.querySelector('#name'),
+        inputQuantity = document.querySelector('#quantity'),
+        inputPrice = document.querySelector('#price'),
+        inputDescription = document.querySelector('#description'),
+        availableRadio = document.querySelector('#available'),
+        soldOutRadio = document.querySelector('#soldout'),
+        inputDistrubutor = document.querySelector('#id_distributor');
+    inputCategory = document.querySelector('#id_category');
+
+    add__product.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const name = inputName.value;
+        const quantity = inputQuantity.value;
+        const price = inputPrice.value;
+
+        let status = 0;
+        if (!availableRadio.checked) {
+            status = 1;
+        }
+        const thumbnail = document.getElementById('thumbnail').files[0];
+        const description = document.getElementById('description').value;
+        const id_distributor = inputDistrubutor.value;
+        const id_category = inputCategory.value;
+
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('quantity', quantity);
+        formData.append('price', price);
+        formData.append('status', status);
+        formData.append('thumbnail', thumbnail);
+        formData.append('description', description);
+        formData.append('id_distributor', id_distributor);
+        formData.append('id_category', id_category);
+
+        fetch('/add-product', {
+            method: 'POST',
+            body: formData
+        })
+            .then(res =>  res.json())
+            .then(data => {
+                alert("Product added successfully")
+                window.location.href = "/Products"
+            })
+            .catch(err => {
+                console.error(err);
+            });
+
+    })
+
+</script>

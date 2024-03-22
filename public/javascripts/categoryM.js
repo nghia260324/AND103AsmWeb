@@ -1,5 +1,5 @@
 const tableTbody = document.querySelector('.table__tbody');
-fetch('/get-list-distributors')
+fetch('/get-list-categories')
     .then(res => res.json())
     .then(distributorData => {
         distributorData.data.forEach((e, index) => {
@@ -8,7 +8,7 @@ fetch('/get-list-distributors')
             <tr>
                 <td class="table__tbody-stt">${index + 1}</td>
                 <td class="table__tbody-name">${e.name}</td>
-                <td><button class="btn__style"><a href="/Distributors/update-distributor/${e._id}"><i class="material-icons">edit</i></a></button></td>
+                <td><button class="btn__style"><a href="/Categories/update-category/${e._id}"><i class="material-icons">edit</i></a></button></td>
                 <td><button onclick="deleteDistributor('${e._id}','${e.name}')" class="btn__style"><i class="material-icons">delete_forever</i></button></td>
             </tr>
         `;
@@ -20,19 +20,19 @@ fetch('/get-list-distributors')
     });
 
 function deleteDistributor(id,name) {
-    fetch(`/check-distributor/${id}`)
+    fetch(`/check-category/${id}`)
     .then(res => res.json())
     .then(data => {
         if (data.status === 200) {
-            if (confirm(`Are you sure you want to delete the distributor "${name}" ?`)) {
-                fetch(`/delete-distributor/${id}`, {
+            if (confirm(`Are you sure you want to delete the category "${name}" ?`)) {
+                fetch(`/delete-category/${id}`, {
                     method: "DELETE"
                 })
                     .then(res => res.json())
                     .then(data => {
                         if (data.status === 200) {
-                            alert('Delete Distributor Successfully!')
-                            window.location.href = '/Distributors';
+                            alert('Delete Category Successfully!')
+                            window.location.href = '/Categories';
                         }
                     })
                     .catch(err => console.log(err))

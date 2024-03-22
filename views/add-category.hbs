@@ -2,7 +2,7 @@
     <div class="wrap">
         <div class="add__product-w">
             <form id="add__product">
-                <h1 style="text-align: center;font-weight: bold;">Add Distributor</h1>
+                <h1 style="text-align: center;font-weight: bold;">Add Category</h1>
                 <label class="label__add" for="name">Name:
                     <input required type="text" id="name" name="name">
                 </label>
@@ -21,7 +21,10 @@
 
         const name = inputName.value;
 
-        fetch('/add-distributor', {
+        const formData = new FormData();
+        formData.append('name', name);
+
+        fetch('/add-category', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -29,8 +32,8 @@
             body: JSON.stringify({ name: name })})
             .then(res =>res.json())
             .then(data => {
-                alert('Distributor added successfully!');
-                window.location.href = '/Distributors'
+                alert('Category added successfully!');
+                window.location.href = '/Categories'
             })
             .catch(err => {
                 console.error(err);

@@ -99,7 +99,7 @@
 
 
 .productsManagement,
-.add__fruit {
+.add__product  {
   min-height: 100vh;
   padding: 78px 0 24px;
 }
@@ -133,13 +133,13 @@ tr,td,th {
   align-items: center;
 }
 
-.add__fruit-w {
+.add__product-w {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-#add__fruit,
-#edit__fruit {
+#add__product,
+#edit__product {
   width: 500px;
   display: flex;
   flex-direction: column;
@@ -154,7 +154,7 @@ tr,td,th {
   align-items: center;
   margin-top: 12px;
 }
-.btn__addFruit {
+.btn__addProduct {
   margin-top: 32px;
 }
 input[type=text],

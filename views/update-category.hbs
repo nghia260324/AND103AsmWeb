@@ -1,36 +1,39 @@
 <div class="add__product">
     <div class="wrap">
         <div class="add__product-w">
-            <form id="add__product">
-                <h1 style="text-align: center;font-weight: bold;">Add Distributor</h1>
+            <form data-product-id="{{category._id}}" id="add__product">
+                <h1 style="text-align: center;font-weight: bold;">Update Category</h1>
                 <label class="label__add" for="name">Name:
-                    <input required type="text" id="name" name="name">
+                    <input value="{{category.name}}" required type="text" id="name" name="name">
                 </label>
-                <button class="btn__addProduct" type="submit">Add</button>
+                <button class="btn__addProduct" type="submit">Update</button>
             </form>
         </div>
     </div>
 </div>
+
 <script>
     const
         add__product = document.querySelector('#add__product'),
         inputName = document.querySelector('#name');
 
+    const productId = add__product.getAttribute('data-product-id')
+
     add__product.addEventListener('submit', function (e) {
         e.preventDefault();
-
         const name = inputName.value;
 
-        fetch('/add-distributor', {
-            method: 'POST',
+        fetch(`/update-category/${productId}`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ name: name })})
-            .then(res =>res.json())
+            body: JSON.stringify({ name: name })
+        })
+            .then(res => res.json())
             .then(data => {
-                alert('Distributor added successfully!');
-                window.location.href = '/Distributors'
+                alert('Category updated successfully!')
+                window.location.href = '/Categories'
             })
             .catch(err => {
                 console.error(err);
