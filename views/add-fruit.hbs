@@ -1,0 +1,38 @@
+<div class="add__fruit">
+    <div class="wrap">
+        <div class="add__fruit-w">
+            <form action="/add-fruit" method="post" id="add__fruit" enctype="multipart/form-data">
+                <h1 style="text-align: center;font-weight: bold;">Thêm sản phẩm</h1>
+                <label class="label__add" for="name">Tên:
+                    <input required type="text" id="name" name="name">
+                </label>
+                <label class="label__add" for="quantity">Số lượng:
+                    <input required type="number" id="quantity" name="quantity">
+                </label>
+                <label class="label__add" for="price">Giá:
+                    <input required type="number" id="price" name="price">
+                </label>
+                <label class="label__add" for="status">Trạng thái:
+                    <input required type="number" id="status" name="status">
+                </label>
+                <label class="label__add" for="thumbnail">Ảnh sản phẩm:
+                    <input required type="file" id="thumbnail" name="thumbnail" accept="image/*">
+                </label>
+                <label class="label__add" for="description">Mô tả:
+                    <input required type="text" id="description" name="description">
+                </label>
+                <label class="label__add" for="id_distributor">Loại:
+                    <select name="id_distributor" id="id_distributor">
+                        {{#each distributors}}
+                        <option value="{{this._id}}">{{this.name}}</option>
+                        {{/each}}
+                    </select>
+                </label>
+                <button class="btn__addFruit" type="submit">Thêm Sản Phẩm</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    
+</script>

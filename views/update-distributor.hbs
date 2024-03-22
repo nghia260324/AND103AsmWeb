@@ -1,0 +1,13 @@
+<div class="add__fruit">
+    <div class="wrap">
+        <div class="add__fruit-w">
+            <form action="/update-distributor/{{distributor._id}}" method="post" id="add__fruit">
+                <h1 style="text-align: center;font-weight: bold;">Sửa thông tin Nhà Phân Phối</h1>
+                <label class="label__add" for="name">Tên:
+                    <input value="{{distributor.name}}" required type="text" id="name" name="name">
+                </label>
+                <button class="btn__addFruit" type="submit">Sửa thông tin</button>
+            </form>
+        </div>
+    </div>
+</div>
