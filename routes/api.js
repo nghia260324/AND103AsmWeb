@@ -2,11 +2,17 @@ var express = require('express');
 var router = express.Router();
 const fs = require('fs');
 const path = require('path');
+const JWT = require('jsonwebtoken');
+const SECRETKEY = 'PH41626';
 
 const Distributors = require('../models/distributors');
 const Categorys = require('../models/categorys');
 const Products = require('../models/products');
 const Users = require('../models/users');
+const Bills = require('../models/bills');
+const OrderDetails = require('../models/orderDetails');
+const Orders = require('../models/orders');
+const Carts = require('../models/cart');
 const Uploads = require('../config/common/upload');
 
 module.exports = router;
@@ -19,15 +25,15 @@ router.post('/add-category', async (req, res) => {
     const result = await newCategory.save();
     if (result) {
         res.json({
-            "status": 200,
-            "messenger": "Thêm thành công!",
-            "data": result,
+            status: 200,
+            messenger: 'Successfully!',
+            data: result,
         });
     } else {
         res.json({
-            "status": 400,
-            "messenger": "Lỗi, Thêm thất bại!",
-            "data": [],
+            status: 400,
+            messenger: 'Failed!',
+            data: [],
         });
     }
 })
@@ -39,15 +45,15 @@ router.post('/add-distributor', async (req, res) => {
     const result = await newDistributors.save();
     if (result) {
         res.json({
-            "status": 200,
-            "messenger": "Thêm thành công!",
-            "data": result,
+            status: 200,
+            messenger: 'Successfully!',
+            data: result,
         });
     } else {
         res.json({
-            "status": 400,
-            "messenger": "Lỗi, Thêm thất bại!",
-            "data": {},
+            status: 400,
+            messenger: 'Failed!',
+            data: {},
         });
     }
 })
@@ -80,6 +86,72 @@ router.post('/add-product', Uploads.single('thumbnail'), async (req, res) => {
         });
     }
 })
+router.post('/add-bill',async(req,res) => {
+    const data = req.body;
+    const newBill = new Bills({
+        id_user: data.id_user,
+    })
+    const result = await newBill.save();
+    if (result) {
+        res.json({
+            status: 200,
+            messenger: 'Successfully!',
+            data: result,
+        })
+    } else {
+        res.json({
+            status: 400,
+            messenger: 'Failed!',
+            data: [],
+        })
+    }
+})
+router.post('/add-orderDetail',async(req,res) => {
+    const data = req.body;
+    const newBillDetail = new BillDetails({
+        id_bill: data.id_bill,
+        id_product: data.id_product,
+        quantity: data.quantity,
+    })
+    const result = await newBillDetail.save();
+    if (result) {
+        res.json({
+            status: 200,
+            messenger: 'Successfully!',
+            data: result,
+        })
+    } else {
+        res.json({
+            status: 400,
+            messenger: 'Failed!',
+            data: [],
+        })
+    }
+})
+router.post('/add-cart',async(req,res) => {
+    const data = req.body;
+    const newCartItem = new Carts({
+        id_user: data.id_user,
+        id_product: data.id_product,
+        quantity: data.quantity,
+        isSelected: data.isSelected,
+    })
+    const result = await newCartItem.save();
+    if (result) {
+        res.json({
+            status: 200,
+            messenger: 'Successfully!',
+            data: result,
+        })
+    } else {
+        res.json({
+            status: 400,
+            messenger: 'Failed!',
+            data: [],
+        })
+    }
+})
+
 router.put('/update-category/:id_category', async (req, res) => {
     const id_category = req.params.id_category;
     const newData = req.body;
@@ -87,15 +159,15 @@ router.put('/update-category/:id_category', async (req, res) => {
     const result = await Categorys.findByIdAndUpdate(id_category, newData, { new: true });
     if (result) {
         res.json({
-            "status": 200,
-            "messenger": "Sửa thành công!",
-            "data": result,
+            status: 200,
+            messenger: 'Successfully',
+            data: result,
         });
     } else {
         res.json({
-            "status": 400,
-            "messenger": "Lỗi, Thêm thất bại!",
-            "data": [],
+            status: 400,
+            messenger: 'Failed',
+            data: [],
         });
     }
 })
@@ -193,19 +265,72 @@ router.post('/update-product-without-thumbnail/:id_product', async (req, res) =>
         console.error("Lỗi khi cập nhật sản phẩm:", error);
     }
 });
+router.put('/update-billDetail/:id_billDetail',async(req,res) => {
+    const id_billDetail = req.params.id_billDetail;
+    const newData = req.body;
+
+    const result = await BillDetails.findByIdAndUpdate(id_billDetail,newData,{new: true}); 
+    if (result) {
+        res.json({
+            status: 200,
+            messenger: 'Successfully',
+            data: result,
+        })
+    } else {
+        res.json({
+            status: 400,
+            messenger: 'Failed',
+            data: [],
+        })
+    }
+
+});
+router.put('/update-cart/:id_cart',async(req,res) => {
+    const id_cart = req.params.id_cart;
+    const newData = req.body;
+    const result = await Carts.findByIdAndUpdate(id_cart,newData, { new: true});
+
+    if (result) {
+        res.json({
+            "status": 200,
+            "messenger": "Successfully!",
+            "data": result,
+        });
+    } else {
+        res.json({
+            "status": 400,
+            "messenger": "Failed!",
+            "data": [],
+        });
+    }
+})
+router.put('/update-cart',async(req,res) => {
+    const newData = req.body;
+    const updatedItems = [];
+    for (const item of newData) {
+        const updatedItem = await Carts.findByIdAndUpdate(item._id, item, { new: true });
+        updatedItems.push(updatedItem);
+    }
+    res.json({
+        "status": 200,
+        "messenger": "Successfully!",
+        "data": updatedItems,
+    });
+})
+
 router.delete('/delete-category/:id_category', async (req, res) => {
     const { id_category } = req.params;
     const result = await Categorys.findByIdAndDelete(id_category);
     if (result) {
         res.json({
             "status": 200,
-            "messenger": "Xóa thành công!",
+            "messenger": "Successfully!",
             "data": result,
         });
     } else {
         res.json({
             "status": 400,
-            "messenger": "Lỗi, Xóa thất bại!",
+            "messenger": "Failed!",
             "data": [],
         });
     }
@@ -248,13 +373,37 @@ router.delete('/delete-product/:id_product', async (req, res) => {
         });
     }
 })
+// router.delete('/delete-bill/:id_bill',async(req,res) => {
+//     const { id_bill } = req.params;
+//     const result = await Bills.findByIdAndDelete(id_bill);
+//     const resultDetail = await BillDetails.deleteMany({ id_bill: id_bill });
+//     if (result) {
+//         res.json({
+//             status: 200,
+//             messenger: 'Successfully',
+//             data: result,
+//         })
+//     } else {
+//         res.json({
+//             status: 400,
+//             messenger: 'Failed',
+//             data: [],
+//         })
+//     }
+// })
+
+
 router.get('/get-user-by-email', async (req, res) => {
     const email = req.query.email;
     const user = await Users.findOne({ email: email });
+    // const token = JWT.sign({id: user._id},SECRETKEY,{expiresIn: '1h'});
+    // const refreshToken = JWT.sign({id: user._id},SECRETKEY,{expiresIn: '1d'});
     res.json({ 
         status: 200,
         messenger: "User!",
-        data: user 
+        data: user,
+        // token: token,
+        // refreshToken: refreshToken,
     });
 });
 router.get('/get-list-categories',async(req,res) => {
@@ -292,6 +441,15 @@ router.get('/get-distributor-by-id/:id_distributor',async(req,res) => {
     });
 })
 router.get('/get-list-products',async(req,res) => {
+    // const authHeader = req.headers['authorization']
+    // const token = authHeader && authHeader.split(' ')[1];
+    // if (token == null) return res.sendStatus(401);
+    // let payload;
+    // JWT.verify(token, SECRETKEY, (err,_payload) => {
+    //     if (err instanceof JWT.TokenExpiredError) return res.sendStatus(401);
+    //     if (err) return res.sendStatus(403);
+    //     payload = _payload;
+    // })
     const data = await Products.find();
     res.json({
         "status": 200,
@@ -308,6 +466,50 @@ router.get('/get-product-by-id/:id_product',async(req,res) => {
         "data": data,
     });
 })
+router.get('/get-list-bill-by-idUser/:id_user',async(req,res) => {
+    const id_user = req.params.id_user;
+    const data = await Bills.find({ id_user: id_user });
+    if (data) {
+        res.json({
+            status: 200,
+            messenger: 'Successfully',
+            data: data,
+        })
+    } else {
+        res.json({
+            status: 400,
+            messenger: 'Failed',
+            data: data,
+        })
+    }
+})
+router.get('/get-bill-by-id/:id_bill',async(req,res) => {
+    const id_bill = req.params.id_bill;
+    const data = await Bills.findById(id_bill);
+    res.json({
+        status: 200,
+        messenger: 'Successfully!',
+        data: data,
+    })
+})
+router.get('/get-list-cart-by-id/:id_user',async(req,res) => {
+    const id_user = req.params.id_user;
+    const data = await Carts.find({id_user: id_user});
+    if (data) {
+        res.json({
+            status: 200,
+            messenger: 'Successfully',
+            data: data,
+        })
+    } else {
+        res.json({
+            status: 400,
+            messenger: 'Failed',
+            data: [],
+        })
+    }
+})
+
 router.post('/register-account',Uploads.single('avatar'),async(req,res) => {
     const data = req.body;
     const {file} = req;
@@ -395,3 +597,44 @@ router.get('/check-distributor/:id', async (req, res) => {
         console.log(error);
     }
 });
+router.get('/search-product',async (req,res) => {
+    const key = req.query.key;
+    const data = await Products.find({name: {'$regex': key, '$options': 'i'}})
+    .sort({creatAt: -1});
+
+    if (data) {
+        res.json({
+            status: 200,
+            messenger: 'Successfully!',
+            data: data,
+        })
+    } else {
+        res.json({
+            status: 400,
+            messenger: 'Failed!',
+            data: data,
+        })
+    }
+})
+
+router.post('/add-order',async(req,res) => {
+    const data = req.body;
+    const newOrder = new Orders({
+        order_code: data.order_code,
+        id_user: data.id_user,
+    })
+    const result = await newOrder.save();
+    if (result) {
+        res.json({
+            status: 200,
+            messenger: 'Successfully!',
+            data: result,
+        })
+    } else {
+        res.json({
+            status: 400,
+            messenger: 'Failed',
+            data: [],
+        })
+    }
+})
